@@ -16,7 +16,7 @@ class FCFS:
         time = 0
         for i in inputs:
             time = max(time, i[1])
-            print(i[0], max(time, i[1]), i[2])
+            #print(i[0], max(time, i[1]), i[2])
             csv_writer.writerow([i[0], max(time, i[1]), i[2]])
             time += i[2]
 
@@ -53,7 +53,7 @@ class RR:
         
             # process active queue
             job = self._active.pop(0)
-            print(job[0], time, min(self._q, job[2]))
+            #print(job[0], time, min(self._q, job[2]))
             csv_writer.writerow([job[0], time, min(self._q, job[2])])
             
             time += min(self._q, job[2])
@@ -117,7 +117,7 @@ class SRTF:
         
         for i in agg:
             csv_writer.writerow(i)
-            print(i)
+            #print(i)
         
         print_metrix(waiting_times, meta)
         f.close()
@@ -141,14 +141,18 @@ class SJF:
             while True:
                 if len(inputs) and inputs[0][1] <= time:
                     job = inputs.pop(0)
-                    t, d = prev_time.get(job[0], (0, self._default_time))
+                    t, d = prev_time.get(job[0], (self._default_time, self._default_time))
                     p = self._alpha * t + (1 - self._alpha) * d
+                    if self._alpha == 0:
+                        print('put', p, job)
                     active.put((p, job))
                 else:
                     break
 
             if active.qsize() > 0:
                 p, job = active.get()
+                if self._alpha == 0:
+                    print('get', p, job)
                 prev_time[job[0]] = (job[2], p)
                 print(job[0], time, job[2])
                 csv_writer.writerow([job[0], time, job[2]])
@@ -157,9 +161,10 @@ class SJF:
                 t = time-(job[3]+job[4])
                 waiting_times.append(t)
                 meta.append([job[0], t])
-            
-            time+=1
+            else:
+                time+=1
         
+        print(prev_time)
         print_metrix(waiting_times, meta)
         f.close()
 
@@ -190,3 +195,13 @@ if __name__ == '__main__':
     print("using SJF")
     c = SJF(0.5, 5)
     c.schedule("SJF", get_input())
+
+    # for i in range(1, 20):
+    #     c = RR(i)
+    #     c.schedule("RR-"+str(i), get_input())
+    for i in [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8 ,0.9, 1]:
+       c = SJF(i, 5)
+       print(i)
+       c.schedule("SJF-"+str(i), get_input()) 
+ 
+
