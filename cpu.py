@@ -189,4 +189,4 @@ if __name__ == '__main__':
 
     print("using SJF")
     c = SJF(0.5, 5)
-    c.schedule("SFJ", get_input())
+    c.schedule("SJF", get_input())
