@@ -8,8 +8,8 @@ def print_metrix(waiting_times, meta):
 
 class FCFS:
     
-    def schedule(self, inputs):
-        f = open("FCFS.csv", 'w')
+    def schedule(self, fname, inputs):
+        f = open(fname + ".csv", 'w')
         csv_writer = csv.writer(f)
         waiting_times = []
         meta = []
@@ -32,13 +32,13 @@ class RR:
         self._q = q
     
     # input (pid, arrive_time, burst_time, original_arrive_time, original_burst_time)
-    def schedule(self, inputs):
+    def schedule(self, fname, inputs):
         self._active = []
         time = 0
         waiting_times = []
         meta = []
         
-        f = open("RR.csv", 'w')
+        f = open(fname + ".csv", 'w')
         csv_writer = csv.writer(f)
         while self._active or inputs:
             while True:
@@ -77,13 +77,13 @@ class RR:
 from Queue import PriorityQueue
 
 class SRTF:
-    def schedule(self, inputs):
+    def schedule(self, fname, inputs):
         active = PriorityQueue()
         time = 0
         agg = []
         waiting_times = []
         meta = []
-        f = open("SRTF.csv", 'w')
+        f = open(fname + ".csv", 'w')
         csv_writer = csv.writer(f)
         while active.qsize() or inputs:
             if len(inputs) and inputs[0][1] <= time:
@@ -129,13 +129,13 @@ class SJF:
         self._default_time = default_time
 
 
-    def schedule(self, inputs):
+    def schedule(self, fname, inputs):
         active = PriorityQueue()
         time = 0
         prev_time = {}
         waiting_times = []
         meta = []
-        f = open("SJF.csv", 'w')
+        f = open(fname + ".csv", 'w')
         csv_writer = csv.writer(f)
         while active.qsize() or inputs:
             while True:
@@ -177,16 +177,16 @@ def get_input():
 if __name__ == '__main__':
     print("using FCFS")
     c = FCFS()
-    c.schedule(get_input())
+    c.schedule("FCFS", get_input())
 
     print("using RR")
     c = RR(2)
-    c.schedule(get_input())
+    c.schedule("RR", get_input())
 
     print("using SRTF")
     c = SRTF()
-    c.schedule(get_input())
+    c.schedule("SRTF", get_input())
 
     print("using SJF")
     c = SJF(0.5, 5)
-    c.schedule(get_input())
+    c.schedule("SFJ", get_input())
