@@ -59,6 +59,11 @@ class RR:
             time += min(self._q, job[2])
             if job[2] > self._q:
                 job[2] -= self._q
+                while True:
+                    if len(inputs) and inputs[0][1] <= time:
+                        self._active.append(inputs.pop(0))
+                    else:
+                        break
                 self._active.append(job)
             else:
                 t = time-(job[3]+job[4])
