@@ -1,30 +1,29 @@
 import csv
 
-def print_metrix(waiting_times, meta):
+def waiting_metrix(waiting_times, meta):
     #print(waiting_times)
     #print(meta)
-    print(1.0*sum(waiting_times)/len(waiting_times))
+    return (1.0*sum(waiting_times)/len(waiting_times))
  
 
 class FCFS:
     
     def schedule(self, fname, inputs):
-        f = open(fname + ".csv", 'w')
-        csv_writer = csv.writer(f)
+        f = open(fname + ".txt", 'w')
         waiting_times = []
         meta = []
         time = 0
         for i in inputs:
             time = max(time, i[1])
             #print(i[0], max(time, i[1]), i[2])
-            csv_writer.writerow([i[0], max(time, i[1]), i[2]])
+            f.write('({}, {})\n'.format(max(time, i[1]), i[0]))
             time += i[2]
 
             t = time - (i[3]+i[4])
             waiting_times.append(t)
             meta.append([i[0], t])
 
-        print_metrix(waiting_times, meta)
+        f.write('Average waiting time {}'.format(waiting_metrix(waiting_times, meta)))
         f.close()
 
 class RR:
@@ -38,8 +37,7 @@ class RR:
         waiting_times = []
         meta = []
         
-        f = open(fname + ".csv", 'w')
-        csv_writer = csv.writer(f)
+        f = open(fname + ".txt", 'w')
         while self._active or inputs:
             while True:
                 if len(inputs) and inputs[0][1] <= time:
@@ -54,8 +52,8 @@ class RR:
             # process active queue
             job = self._active.pop(0)
             #print(job[0], time, min(self._q, job[2]))
-            csv_writer.writerow([job[0], time, min(self._q, job[2])])
-            
+            f.write('({}, {})\n'.format(time, job[0]))
+
             time += min(self._q, job[2])
             if job[2] > self._q:
                 job[2] -= self._q
@@ -70,11 +68,11 @@ class RR:
                 waiting_times.append(t)
                 meta.append([job[0], t])
         
-        print_metrix(waiting_times, meta)
+        f.write('Average waiting time {}'.format(waiting_metrix(waiting_times, meta)))
         f.close()
         
 
-from Queue import PriorityQueue
+from queue import PriorityQueue
 
 class SRTF:
     def schedule(self, fname, inputs):
@@ -83,8 +81,7 @@ class SRTF:
         agg = []
         waiting_times = []
         meta = []
-        f = open(fname + ".csv", 'w')
-        csv_writer = csv.writer(f)
+        f = open(fname + ".txt", 'w')
         while active.qsize() or inputs:
             if len(inputs) and inputs[0][1] <= time:
                 job = inputs.pop(0)
@@ -116,10 +113,10 @@ class SRTF:
             time+=1
         
         for i in agg:
-            csv_writer.writerow(i)
+            f.write('({}, {})\n'.format(i[1], i[0]))
             #print(i)
         
-        print_metrix(waiting_times, meta)
+        f.write('Average waiting time {}'.format(waiting_metrix(waiting_times, meta)))
         f.close()
 
 
@@ -135,8 +132,7 @@ class SJF:
         prev_time = {}
         waiting_times = []
         meta = []
-        f = open(fname + ".csv", 'w')
-        csv_writer = csv.writer(f)
+        f = open(fname + ".txt", 'w')
         while active.qsize() or inputs:
             while True:
                 if len(inputs) and inputs[0][1] <= time:
@@ -155,7 +151,7 @@ class SJF:
                     print('get', p, job)
                 prev_time[job[0]] = (job[2], p)
                 print(job[0], time, job[2])
-                csv_writer.writerow([job[0], time, job[2]])
+                f.write('({}, {})\n'.format(time, job[0]))
                 time += job[2]
 
                 t = time-(job[3]+job[4])
@@ -165,7 +161,7 @@ class SJF:
                 time+=1
         
         print(prev_time)
-        print_metrix(waiting_times, meta)
+        f.write('Average waiting time {}'.format(waiting_metrix(waiting_times, meta)))
         f.close()
 
 
@@ -196,9 +192,9 @@ if __name__ == '__main__':
     c = SJF(0.5, 5)
     c.schedule("SJF", get_input())
 
-    # for i in range(1, 20):
-    #     c = RR(i)
-    #     c.schedule("RR-"+str(i), get_input())
+    for i in range(1, 20):
+        c = RR(i)
+        c.schedule("RR-"+str(i), get_input())
     for i in [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8 ,0.9, 1]:
        c = SJF(i, 5)
        print(i)
